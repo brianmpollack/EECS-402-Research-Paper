@@ -1,14 +1,45 @@
-\documentclass[10pt,journal]{IEEEtran}
+\documentclass[12pt,journal]{IEEEtran}
+\usepackage[
+  backend=biber,
+  style=numeric,
+  citestyle=numeric
+]{biblatex}
+\addbibresource{citations.bib}
+\providecommand{\keywords}[1]{\textbf{Keywords} #1}
 \begin{document}
-\title{Deanonymize End Users on Tor}
-\author{William Liddy and Brian Pollack}
+\title{Traffic Analysis on Tor}
+\author{\IEEEauthorblockN{William Liddy\IEEEauthorrefmark{1}, Brian Pollack\IEEEauthorrefmark{2}}\\
+        \IEEEauthorblockA{Department of Electrical Engineering and Computer Science\\Case Western Reserve University\\Cleveland, OH 44106\\\IEEEauthorrefmark{1}wjl36@case.edu, \IEEEauthorrefmark{2}bmp55@case.edu}}
 \maketitle
 
 \begin{abstract}
 TODO: Abstract
 \end{abstract}
 
+% \keywords\\{TOR; Onion Routing, }
+
 \section{Introduction}
 \IEEEPARstart{T}{his} is the introduction.
 
+\section{Background}
+\subsection{Tor Architecture}
+Tor is a circuit-based anonymous communication service that uses Onion Routing to securely pass packets in the network. Onion Routing is an overlay network protocol that is designed to carry TCP packets over existing networks. Traffic flows through the network in fixed size segments. Each node unwraps a layer from the packet using a symmetric key and forwards it to the next node. The packet is unwrapped like an union, which is where the name comes from.
+\par
+Tor routes its traffic using circuits. A user will set up a circuit using at least three Tor nodes, and that circuit stays active until the user either is finished or requests a new circuit. Tor circuits can carry most TCP applications (HTTP, SSH, etc.), however cannot carry UDP packets. A single Tor circuit can carry multiple simultaneous streams, which is good for HTTP traffic which opens multiple connections to multiple destinations.
+\par
+While some anonymity services will reorder, mix, or otherwise shape the traffic flowing between Onion Routers, Tor chooses to not attempt to shape the traffic. The creators believed that all currently available traffic shaping strategies were still vulnerable to attacks and were difficult to implement practically. They also wanted to make Tor as low-latency as possible, and reordering packets would increase latency. Tor simply sends traffic in a round robin fashion.
+\par
+To protect against traffic bottlenecks, Tor uses a decentralized congestion control mechanism that sends end-to-end ack packets to maintain anonymity while allowing edge nodes to detect congestion and throttle their traffic until congestion subsides.
+\par
+Traffic is only allowed to leave the Tor network through nodes which specifically allow exits (called exit nodes). Each node has a policy stating which traffic is allowed to leave the network: this can be restricted by IP address or protocol. \cite{Dingledine:2004:TSO:1251375.1251396}
+
+\subsection{Tor Threat Model}
+
+
+\subsection{Previous Work}
+
+\section{Our Setup and Results}
+
+
+\printbibliography
 \end{document}

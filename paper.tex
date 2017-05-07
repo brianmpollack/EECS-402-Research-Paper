@@ -4,6 +4,7 @@
   style=numeric,
   citestyle=numeric
 ]{biblatex}
+\usepackage{graphicx}
 \addbibresource{citations.bib}
 \providecommand{\keywords}[1]{\textbf{Keywords} #1}
 \begin{document}
@@ -43,10 +44,22 @@ Additionally, it is important to note that Tor does not protect against traffic 
 With our attacks, we try to gain information about the path of the Tor circuit using methods available to all Tor users. It is important to note that we do not exit the threat model for which Tor is built. We demonstrate that small attackers are able to gain insights about Tor users. This means that both government and non-government agencies are able to carry out these attacks on Tor.
 
 \subsection{Previous Work}
+In 2005, Murdoch and Danezis studied similar attacks to the Tor network. They assumed that an adversary created a corrupt Tor node on the network. The corrupt node is then used to measure other nodes' traffic load. Additionally, they assumed that the attackers controlled a network server that the user to be traced is accessing. Murdoch and Danezis claim that this threat is within the threat model that should be covered by Tor. If the attackers modulate the data through the network server that the user is accessing, they were able to observe similar modulations in the Tor circuit that the user was using. This means, therefore, that the attackers could trace the user through the Tor circuit and link a user with the services he or she is using \cite{Murdoch:2005:LTA:1058433.1059390}. Figure \ref{murdochsetup} shows Murdoch and Danezis's attack setup.
+\begin{figure*}
 
+ \center
+  \includegraphics[width=\textwidth]{figures/murdochattacksetup.png}
+  \caption{Murdoch and Danezis's Attack Setup}
+  \label{murdochsetup}
+\end{figure*}
 
 \section{Our Setup and Results}
-
+We wanted to test to see if the Tor network was still vulnerable to Murdoch and Danezis's attack. We did not simply duplicate their attack. Rather, we modified it slightly and reevaluated the exact attack scenarios. We wanted to demonstrate that this attack has significant real world implications that need to be addressed by the Tor network.
+\subsection{Consensus Values}
+When a Tor node is first created, it goes through four phases as it is being added to the Tor network. Each phase allows a different amount of traffic to be routed through the new node.
+\subsubsection{Phase 1: unmeasured}
+When a relay is first started, it will self-test its bandwidth. It publishes the results to its relay descriptor. For the first few days, the Tor network will allow only 20KB/s of bandwidth through the new node.
+\subsubsection{Phase 2: remote measurement}
 
 \printbibliography
 \end{document}

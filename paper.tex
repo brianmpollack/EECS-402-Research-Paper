@@ -34,9 +34,16 @@ To protect against traffic bottlenecks, Tor uses a decentralized congestion cont
 Traffic is only allowed to leave the Tor network through nodes which specifically allow exits (called exit nodes). Each node has a policy stating which traffic is allowed to leave the network: this can be restricted by IP address or protocol. \cite{Dingledine:2004:TSO:1251375.1251396}
 
 \subsection{Tor Threat Model}
-
+Tor is designed to be impossible for attackers to link users with the services to which they are connecting \cite{Dingledine:2004:TSO:1251375.1251396}. The main goal of most attackers to the Tor network, therefore, is to de-identify its users and observe the remote services they are accessing. The attacker would then be limited by other encryption protocols, such as HTTPS, but that is beyond the scope of our study. A secondary goal of an attacker would be to group network connections, establishing a link among multiple connections to the same initiator. This would allow the attacker to build a profile on the user be observing with whom the user is communicating and by observing the user’s communication habits \cite{Murdoch:2005:LTA:1058433.1059390}.
+\par
+Tor is designed to protect against an adversary who can observe some fraction of network traffic. This adversary can generate, modify, delete, or delay traffic and can operate his or her own tor nodes. The adversary can also compromise some fraction of existing tor nodes\cite{Dingledine:2004:TSO:1251375.1251396}.
+\par
+Additionally, it is important to note that Tor does not protect against traffic confirmation attacks, which are when an adversary suspects two parties are communicating and tries to prove it by analyzing the network. Tor rather attempts to make it difficult to identify who is communicating without a solid suspicion \cite{Murdoch:2005:LTA:1058433.1059390}.
+\par
+With our attacks, we try to gain information about the path of the Tor circuit using methods available to all Tor users. It is important to note that we do not exit the threat model for which Tor is built. We demonstrate that small attackers are able to gain insights about Tor users. This means that both government and non-government agencies are able to carry out these attacks on Tor.
 
 \subsection{Previous Work}
+
 
 \section{Our Setup and Results}
 

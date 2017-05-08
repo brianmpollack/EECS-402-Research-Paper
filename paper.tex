@@ -112,6 +112,11 @@ To conduct our experiments, we first set up one Tor relay node and one Tor exit 
 This setup is not unreasonable. We had three machines involved, including both the victim and analysis nodes. If the attacker has access to a victim's network, he or she could modulate the traffic by delaying packets, causing similar delays that we were using to experiment. If the attacker has access to the server to which the victim is connecting, the attacker can modulate the traffic there.
 One additional way, which is the easiest for attackers to exploit, is for an attacker to interject his or her own content into the victim's connection by serving his or her modulated content on a legitimate website that the victim is accessing. For example, the simplest way of forcing the victim to download this modulated traffic is if the attacker purchased an advertisement on a website the victim was browsing. The attacker could then modulate the content that is downloaded by the client to load the advertisement.
 Next, the attacker would need to have enough analysis nodes to be able to measure a significant percentage of the available Tor nodes. Because the attacker does not know any information about the victim's Tor circuit, he or she will need to analyze multiple nodes until the circuit is discovered. Especially if the search was limited to a subset of the active Tor nodes, we believe it is not unreasonable to assume that this attack is possible. The subset of measured nodes could start with all of the guard nodes, for example, which we know should constitute one hop in the victim's circuit.
-
+\subsubsection{Comparison with Murdoch's Attack}
+Our attack is similar to Murdoch's attack. TODO
+\subsection{Our Results}
+TODO
+\section{Conclusions}
+TODO
 \printbibliography
 \end{document}

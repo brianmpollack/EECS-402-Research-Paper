@@ -24,9 +24,15 @@ TODO: Abstract
 
 \section{Background}
 \subsection{Tor Architecture}
-Tor is a circuit-based anonymous communication service that uses Onion Routing to securely pass packets in the network. Onion Routing is an overlay network protocol that is designed to carry TCP packets over existing networks. Traffic flows through the network in fixed size segments. Each node unwraps a layer from the packet using a symmetric key and forwards it to the next node. The packet is unwrapped like an union, which is where the name comes from.
+Tor is a circuit-based anonymous communication service that uses Onion Routing to securely pass packets in the network.
 \par
-Tor routes its traffic using circuits. A user will set up a circuit using at least three Tor nodes, and that circuit stays active until the user either is finished or requests a new circuit. Tor circuits can carry most TCP applications (HTTP, SSH, etc.), however cannot carry UDP packets. A single Tor circuit can carry multiple simultaneous streams, which is good for HTTP traffic which opens multiple connections to multiple destinations.
+A Tor circuit is the path that communication takes from the client to the desired destination. A circuit consists of multiple servers, called nodes, and is typically three nodes, or hops, long. To set up a circuit, the client must know the servers in which it would like to connect. The Tor network provides a list of appropriate nodes. The client then can send TCP packets through the circuit.
+\par
+Onion Routing is an overlay network protocol that is designed to carry TCP packets over existing networks. Traffic flows through the network in fixed size segments. Each node unwraps a layer from the packet using a symmetric key and forwards it to the next node. The packet is unwrapped like an union, which is where the name comes from.
+\par
+Tor routes its traffic using circuits. A user will set up a circuit using at least three Tor nodes, and that circuit stays active until the user either is finished or requests a new circuit. Tor circuits can carry any TCP packet, as long as the application supports routing through Tor, however cannot carry UDP packets. A single Tor circuit can carry multiple simultaneous streams, which is good for HTTP traffic which opens multiple connections to multiple destinations.
+\par
+One common attack against anonymous communication networks is known as traffic analysis. An attacker will analyze the traffic through a network to try to de-anonymize the users.
 \par
 While some anonymity services will reorder, mix, or otherwise shape the traffic flowing between Onion Routers, Tor chooses to not attempt to shape the traffic. The creators believed that all currently available traffic shaping strategies were still vulnerable to attacks and were difficult to implement practically. They also wanted to make Tor as low-latency as possible, and reordering packets would increase latency. Tor simply sends traffic in a round robin fashion.
 \par
@@ -82,7 +88,7 @@ It is also worth stating that there are many other configuration options for the
   \label{oursetup}
 \end{figure*}
 \subsubsection{Our Threat Model}
-We begin with the assumption that a client will be accessing a service over the Tor network. We can also assume that an attacker has some control over either the client's network or the network of the web service. Lastly, we assume that the attacker has the ability to add a few nodes to the Tor network. All three of these assumptions are within the Tor threat model \cite{Dingledine:2004:TSO:1251375.1251396}.
+We begin with the assumption that a client will be accessing a service over the Tor network. We can also assume that an attacker has some control over and can generate, modify, delete, or delay traffic on either the client's network or the network of the web service. Lastly, we assume that the attacker has the ability to add a few nodes to the Tor network. All three of these assumptions are within the Tor threat model \cite{Dingledine:2004:TSO:1251375.1251396}.
 To conduct our experiments, we first set up one Tor relay node and one Tor exit node, both using Lightsail on Amazon Web Services, and waited for them to be accepted to the Tor network.
 \subsubsection{Our Victim}We then set up a victim machine which used the Tor network to download a large photo. The photo was hosted on an Apache webserver on the same machine as the victim client. The victim client used the Tor network to reach an arbitrary exit node which would then connect back to the webserver and download the image. The victim client was programmed to download the image for sixty seconds, then pause for sixty seconds, then repeat this process with a new Tor circuit.
 \subsubsection{Our Analysis Node}The victim machine sent the fingerprints of the Tor nodes in each circuit it was using to our analysis node. The analysis node set up a Tor circuit through one of the nodes in the victim’s circuit so it could try to detect that the client was using that node. We measured both the change in RTT and change in throughput through the analyzed node. See figure \ref{oursetup} for a diagram of our setup.

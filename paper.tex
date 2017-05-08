@@ -47,7 +47,7 @@ With our attacks, we try to gain information about the path of the Tor circuit u
 
  \center
   \includegraphics[width=\textwidth]{figures/murdochattacksetup.png}
-  \caption{Murdoch and Danezis's Attack Setup}
+  \caption{Murdoch and Danezis's Attack Setup \cite{Murdoch:2005:LTA:1058433.1059390}}
   \label{murdochsetup}
 \end{figure*}
 
@@ -61,15 +61,33 @@ When a Tor node is first created, it goes through four phases as it is being add
 \subsubsection{Consensus Weight}
 If anybody could immediately add a node to the Tor network and advertise that it can handle a large amount of traffic, other users would immediately start sending data through that new node. This means that an adversary could easily set up a node and allow many clients to set up circuits through it, then delay or drop those connections. It would be easy for adversaries to disrupt the Tor network. To combat this issue, Tor uses a measurement called consensus weight. Each client starts with a low consensus weight and, as other users send data through the new node, if the Tor network determines that the new node is performing well, the consensus weight will increase. The Tor network sends more traffic to nodes with a higher consensus weight.
 \subsubsection{Guard Nodes}
-On the Tor network, most clients build three hop curcuits. The very first Tor node with which a client interacts is slightly different than the rest because it helps protect the client against certain attacks. This first node is called a guard node. An anonymity attack that may be performed on the Tor network can look like this: if a client picks N paths at random, and an adversary controls a few Tor relays, then over time the chance that the client has made no connections through compromised Tor nodes goes to zero. The philosophy behind guard nodes is that the client will pick a guard node and will make every subsequent Tor circuit using that same guard node as the first hop. Either all of the client's connections will be compromised (the guard node will know the IP address of the client), or none of the client's connections will be compromised (each subsequent node in the circuit may know the guard node, but will never know the IP of the client). Once a Tor node is listed as a guard node, most clients will not use it as a middle node in a Tor circuit. This helps prevent the few nodes which are trusted as guard nodes from being overloaded.
+On the Tor network, most clients build three hop curcuits. The very first Tor node with which a client interacts is slightly different than the rest because it helps protect the client against certain attacks. This first node is called a guard node. An anonymity attack that may be performed on the Tor network can look like this: if a client picks N paths at random, and an adversary controls a few Tor relays, then over time the chance that the client has made no connections through compromised Tor nodes goes to zero. The philosophy behind guard nodes is that the client will pick a guard node and will make every subsequent Tor circuit using that same guard node as the first hop. Either all of the client's connections will be compromised (the guard node will know the IP address of the client), or none of the client's connections will be compromised (each subsequent node in the circuit may know the guard node, but will never know the IP of the client). Once a Tor node is listed as a guard node, most clients will not use it as a middle node in a Tor circuit. This helps prevent the few nodes which are trusted as guard nodes from being overloaded \cite{arma2013}.
 \subsubsection{Phase 1: unmeasured}
-When a relay is first started, it will self-test its bandwidth. It publishes the results to its relay descriptor. For the first few days, the Tor network will allow only 20KB/s of bandwidth through the new node.
+When a relay is first started, it will self-test its bandwidth. It publishes the results to its relay descriptor. For the first few days, the Tor network will allow only 20KB/s of bandwidth through the new node \cite{arma2013}.
 \subsubsection{Phase 2: remote measurement}
-After a few days, the new node will have received enough connections, despite its bandwidth being capped at 20KB/s, to begin to receive an increased consensus weight. When more traffic is received, if the node performs well enough, the consensus weight will be raised even more. During this phase, however, a node cannot be a guard node. The node will remain a middle node in the Tor network until moving on to phase three.
+After a few days, the new node will have received enough connections, despite its bandwidth being capped at 20KB/s, to begin to receive an increased consensus weight. When more traffic is received, if the node performs well enough, the consensus weight will be raised even more. During this phase, however, a node cannot be a guard node. The node will remain a middle node in the Tor network until moving on to phase three \cite{arma2013}.
 \subsubsection{Phase 3: ramping up, guard relay}
-To become a guard relay, a node must have a large enough consensus weight, a high enough uptime percentage, and a long enough time known to the Tor network. A node is eligible to become a guard node on the eigth day of its existance on the Tor network, assuming the first two conditions are satisfied. Over time, more and more clients will use the new node as a guard node and will remember that node to use for their next connections.
+To become a guard relay, a node must have a large enough consensus weight, a high enough uptime percentage, and a long enough time known to the Tor network. A node is eligible to become a guard node on the eigth day of its existance on the Tor network, assuming the first two conditions are satisfied. Over time, more and more clients will use the new node as a guard node and will remember that node to use for their next connections \cite{arma2013}.
 \subsubsection{Phase 4: steady state, guard node}
-Finally, once the new Tor relay has been a guard node for approximately twelve weeks, it will reach a steady state in which the number of new clients connecting to it as a guard node is equal to the number of clients who decide to choose a new guard node. This prevents the oldest guard nodes from becoming overloaded with traffic.
+Finally, once the new Tor relay has been a guard node for approximately twelve weeks, it will reach a steady state in which the number of new clients connecting to it as a guard node is equal to the number of clients who decide to choose a new guard node. This prevents the oldest guard nodes from becoming overloaded with traffic \cite{arma2013}.
+\subsection{TORRC Configuration}
+To configure the Tor service on a unix machine, the node operator has to modify the torrc configuration file. We just talked about the Tor service automatically ramping up bandwidth, but we point out that a node operator may choose to force the node to use a smaller bandwidth than his or her network will allow. An operator may choose to restrict bandwidth so the Tor node does not consume too much of the network.
+\par
+It is also worth stating that there are many other configuration options for the Tor service, and they are mostly located in the torrc configuration file. An operator can choose whether or not to allow the node to operate as a relay node or as an exit node and can set the ports that the tor service uses, among many other configuration options.
+\subsection{Our Attack}
+\begin{figure*}
+ \center
+  \includegraphics[width=\textwidth]{figures/oursetup.png}
+  \caption{Our attack setup}
+  \label{oursetup}
+\end{figure*}
+\subsubsection{Our Threat Model}
+We begin with the assumption that a client will be accessing a service over the Tor network. We can also assume that an attacker has some control over either the client's network or the network of the web service. Lastly, we assume that the attacker has the ability to add a few nodes to the Tor network. All three of these assumptions are within the Tor threat model \cite{Dingledine:2004:TSO:1251375.1251396}.
+To conduct our experiments, we first set up one Tor relay node and one Tor exit node, both using Lightsail on Amazon Web Services, and waited for them to be accepted to the Tor network.
+\subsubsection{Our Victim}We then set up a victim machine which used the Tor network to download a large photo. The photo was hosted on an Apache webserver on the same machine as the victim client. The victim client used the Tor network to reach an arbitrary exit node which would then connect back to the webserver and download the image. The victim client was programmed to download the image for sixty seconds, then pause for sixty seconds, then repeat this process with a new Tor circuit.
+\subsubsection{Our Analysis Node}The victim machine sent the fingerprints of the Tor nodes in each circuit it was using to our analysis node. The analysis node set up a Tor circuit through one of the nodes in the victim’s circuit so it could try to detect that the client was using that node. We measured both the change in RTT and change in throughput through the analyzed node. See figure \ref{oursetup} for a diagram of our setup.
+\subsubsection{Implications}
+
 
 \printbibliography
 \end{document}

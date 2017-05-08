@@ -27,7 +27,9 @@ Our results indicate that if a victim is downloading or streaming a large file a
 % \keywords\\{TOR; Onion Routing, }
 
 \section{Introduction}
-\IEEEPARstart{J}{ust elaborate on the first two paragraphs of the abstract} 
+\IEEEPARstart{T}{he} main goal of Tor is to keep its clients anonymous while accessing services on the Internet. Tor is designed to function under certain assumptions, called its threat model. As long as attackers do not have more resources than Tor's threat model assumes, it is supposed to remain secure. In this paper we demonstrate that, while remainin within Tor's threat model, we can identify certain users on the Tor network.
+\par
+Murdoch and Danezis analyzed similar traffic analysis attacks in 2005 and were able to successfully identify certain users. Given that the Tor ecosystem is vastly larger today (over 7,000 nodes at the time of writing), we wanted to see if such traffic analysis attacks are still possible. We theorized that the larger userbase would help mix traffic and make it difficult to detect a user's connection, but we were still able to duplicate the results that Murdoch and Danezis produced.
 \section{Background}
 \subsection{Tor Architecture}
 Tor is a circuit-based anonymous communication service that uses Onion Routing to securely pass packets through a network.
@@ -89,7 +91,7 @@ If anybody could immediately add a relay to the Tor network and advertise that i
 \subsubsection{Guard relays}
 On the Tor network, most clients build three hop circuits. The very first Tor relay with which a client interacts is slightly different than the rest because it helps protect the client against certain attacks. This first relay is called a guard relay. An anonymity attack that may be performed on the Tor network can look like this: if a client picks N paths at random, and an adversary controls a few Tor relays, then over time the chance that the client has made no connections through compromised Tor relays goes to zero. The philosophy behind guard relays is that the client will pick a guard relay and will make every subsequent Tor circuit using that same guard relay as the first hop. Either all of the client's connections will be compromised (the guard relay will know the IP address of the client), or none of the client's connections will be compromised (each subsequent relay in the circuit may know the guard relay, but will never know the IP address of the client). Once a Tor relay is listed as a guard relay, most clients will not use it as a middle relay in a Tor circuit. This helps prevent the few relays which are trusted as guard relays from being overloaded \cite{arma2013}.
 \subsubsection{Phase 1: unmeasured}
-When a relay is first started, it will self-test its bandwidth. It publishes the results to its relay descriptor. For the first few days, the Tor network will allow only 20KB/s of bandwidth through the new relay \cite{arma2013}.
+When a relay is first started, it will self-test its bandwidth. It publishes the results to its relay descriptor. A relay descriptor is the information about a relay on the Tor network. This is sent to other Tor nodes so they can determine which nodes to use when building circuits. For the first few days, the Tor network will allow only 20KB/s of bandwidth through the new relay \cite{arma2013}.
 \subsubsection{Phase 2: remote measurement}
 After a few days, the new relay will have received enough connections, despite its bandwidth being capped at 20KB/s, to begin to receive an increased consensus weight. When more traffic is received, if the relay performs well enough, the consensus weight will be raised even more. During this phase, however, a relay cannot be a guard relay. The relay will remain a middle relay in the Tor network until moving on to phase three \cite{arma2013}.
 \subsubsection{Phase 3: ramping up, guard relay}

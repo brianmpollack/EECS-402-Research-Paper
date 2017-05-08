@@ -43,8 +43,6 @@ Additionally, it is important to note that Tor does not protect against traffic 
 \par
 With our attacks, we try to gain information about the path of the Tor circuit using methods available to all Tor users. It is important to note that we do not exit the threat model for which Tor is built. We demonstrate that small attackers are able to gain insights about Tor users. This means that both government and non-government agencies are able to carry out these attacks on Tor.
 
-\subsection{Previous Work}
-In 2005, Murdoch and Danezis studied similar attacks to the Tor network. They assumed that an adversary created a corrupt Tor node on the network. The corrupt node is then used to measure other nodes' traffic load. Additionally, they assumed that the attackers controlled a network server that the user to be traced is accessing. Murdoch and Danezis claim that this threat is within the threat model that should be covered by Tor. If the attackers modulate the data through the network server that the user is accessing, they were able to observe similar modulations in the Tor circuit that the user was using. This means, therefore, that the attackers could trace the user through the Tor circuit and link a user with the services he or she is using \cite{Murdoch:2005:LTA:1058433.1059390}. Figure \ref{murdochsetup} shows Murdoch and Danezis's attack setup.
 \begin{figure*}
 
  \center
@@ -53,13 +51,25 @@ In 2005, Murdoch and Danezis studied similar attacks to the Tor network. They as
   \label{murdochsetup}
 \end{figure*}
 
+\subsection{Previous Work}
+In 2005, Murdoch and Danezis studied similar attacks to the Tor network. They assumed that an adversary created a corrupt Tor node on the network. The corrupt node is then used to measure other nodes' traffic load. Additionally, they assumed that the attackers controlled a network server that the user to be traced is accessing. Murdoch and Danezis claim that this threat is within the threat model that should be covered by Tor. If the attackers modulate the data through the network server that the user is accessing, they were able to observe similar modulations in the Tor circuit that the user was using. This means, therefore, that the attackers could trace the user through the Tor circuit and link a user with the services he or she is using \cite{Murdoch:2005:LTA:1058433.1059390}. Figure \ref{murdochsetup} shows Murdoch and Danezis's attack setup.
+
 \section{Our Setup and Results}
 We wanted to test to see if the Tor network was still vulnerable to Murdoch and Danezis's attack. We did not simply duplicate their attack. Rather, we modified it slightly and reevaluated the exact attack scenarios. We wanted to demonstrate that this attack has significant real world implications that need to be addressed by the Tor network.
 \subsection{Consensus Values}
 When a Tor node is first created, it goes through four phases as it is being added to the Tor network. Each phase allows a different amount of traffic to be routed through the new node.
+\subsubsection{Consensus Weight}
+If anybody could immediately add a node to the Tor network and advertise that it can handle a large amount of traffic, other users would immediately start sending data through that new node. This means that an adversary could easily set up a node and allow many clients to set up circuits through it, then delay or drop those connections. It would be easy for adversaries to disrupt the Tor network. To combat this issue, Tor uses a measurement called consensus weight. Each client starts with a low consensus weight and, as other users send data through the new node, if the Tor network determines that the new node is performing well, the consensus weight will increase. The Tor network sends more traffic to nodes with a higher consensus weight.
+\subsubsection{Guard Nodes}
+On the Tor network, most clients build three hop curcuits. The very first Tor node with which a client interacts is slightly different than the rest because it helps protect the client against certain attacks. This first node is called a guard node. An anonymity attack that may be performed on the Tor network can look like this: if a client picks N paths at random, and an adversary controls a few Tor relays, then over time the chance that the client has made no connections through compromised Tor nodes goes to zero. The philosophy behind guard nodes is that the client will pick a guard node and will make every subsequent Tor circuit using that same guard node as the first hop. Either all of the client's connections will be compromised (the guard node will know the IP address of the client), or none of the client's connections will be compromised (each subsequent node in the circuit may know the guard node, but will never know the IP of the client). Once a Tor node is listed as a guard node, most clients will not use it as a middle node in a Tor circuit. This helps prevent the few nodes which are trusted as guard nodes from being overloaded.
 \subsubsection{Phase 1: unmeasured}
 When a relay is first started, it will self-test its bandwidth. It publishes the results to its relay descriptor. For the first few days, the Tor network will allow only 20KB/s of bandwidth through the new node.
 \subsubsection{Phase 2: remote measurement}
+After a few days, the new node will have received enough connections, despite its bandwidth being capped at 20KB/s, to begin to receive an increased consensus weight. When more traffic is received, if the node performs well enough, the consensus weight will be raised even more. During this phase, however, a node cannot be a guard node. The node will remain a middle node in the Tor network until moving on to phase three.
+\subsubsection{Phase 3: ramping up, guard relay}
+To become a guard relay, a node must have a large enough consensus weight, a high enough uptime percentage, and a long enough time known to the Tor network. A node is eligible to become a guard node on the eigth day of its existance on the Tor network, assuming the first two conditions are satisfied. Over time, more and more clients will use the new node as a guard node and will remember that node to use for their next connections.
+\subsubsection{Phase 4: steady state, guard node}
+Finally, once the new Tor relay has been a guard node for approximately twelve weeks, it will reach a steady state in which the number of new clients connecting to it as a guard node is equal to the number of clients who decide to choose a new guard node. This prevents the oldest guard nodes from becoming overloaded with traffic.
 
 \printbibliography
 \end{document}
